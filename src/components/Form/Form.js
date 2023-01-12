@@ -1,10 +1,14 @@
 import css from './Form.module.css'
 import React from "react";
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contacts';
+import { getContacts } from 'redux/selectors';
 
+export const Form = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
 
-export const Form = ({onSubmit}) => {
-  
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
@@ -23,15 +27,24 @@ export const Form = ({onSubmit}) => {
     }
   };
   
-  const handleSubmit = event => {
-    event.preventDefault();
-    onSubmit(
-      event.target.elements.name.value,
-      event.target.elements.number.value
-    )
+  const handleSubmit = e => {
+    e.preventDefault();
+    const existingName = contacts.some(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
+    );
+    const existingNumber = contacts.some(contact => contact.number === number);
+
+    if (existingName) {
+      alert ('This name is already exist')
+      return;
+    } else if (existingNumber) {
+      alert ('This number is already exist')
+      return;
+    }
+    dispatch(addContact(name, number));
     reset();
-  }
-  
+  };
+
   const reset = () => {
    setName('');
    setNumber('');
